@@ -9,102 +9,111 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<!-- Google map API 
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA38N74y_xGwSV0bI_36OIXDdH-corZO5A&callback=myMap"></script>
+		-->
 		<style>
-			body {
-				background-color : LightGray;
+			a:hover {
+				text-decoration 	: none;
 			}
-			#header {
-				background-color : White;
+			.label:empty {
+				display 	: none;
 			}
-			.content {
-				background-color : White;
+			.textblue {
+				color 	: blue;
 			}
-			.spacer {
-				height : 10px;
-				background-color : LightGray;
+			.textblack {
+				color 	: black;
 			}
-			.badge {
-				background-color : LightGray;
+			#map {
+				background-color : lightgrey;
 			}
-			.div_card {
-				background-color : LightGray;
+			#price {
+				font-size 		: 20px;
+			}
+			#bigfont {
+				font-size 		: 20px;
 			}
 		</style>
 	</head>
 
 	<body ng-app="myApp">
-		<div class="row spacer"></div>
-		<div class="container" id="header">
-			<div class="row">
-				<div class="col-lg-12"><h3>HARGA UDANG</h3></div>
-			</div>
-			<div class="row spacer"></div>
-			<div class="row">
-				<div class="col-lg-4 form-group">
-					<label for="filterLokasi1">Filter lokasi :</label>
-					<select class="form-control input-sm" id="filterLokasi1">
-						<option value="" disabled selected>Pilih Provinsi</option>
-						<option>2</option>
-						<option>3</option>
-						<option>4</option>
-					</select>
-					<select class="form-control input-sm" id="filterLokasi2">
-						<option value="" disabled selected>Pilih Kabupaten</option>
-						<option>2</option>
-						<option>3</option>
-						<option>4</option>
-					</select>
-				</div>
-				<div class="col-lg-4 form-group">
-					<label for="filterUpdate">Urutkan berdasarkan :</label>
-					<select class="form-control input-sm" id="filterUpdate">
-						<option>Terbaru</option>
-						<option>Terlama</option>
-					</select>
-				</div>
-				<div class="col-lg-4 form-group">
-					<label for="filterHarga">Urutkan harga :</label>
-					<select class="form-control input-sm" id="filterHarga">
-						<option>Acak</option>
-						<option>Termahal</option>
-						<option>Termurah</option>
-					</select>
-				</div>
+		<div id="header">
+			<div>
+				<h3><center>HARGA UDANG</center></h3>
+				<hr />
 			</div>
 		</div>
-		<div class="row spacer"></div>
-		<div class="container">
-			<div class="row content">
-				<div class="col-lg-6">
-					<p>Persebaran Harga Udang</p>
-					<hr />
-				</div>
-				<div class="col-lg-6">
-					<p>List Harga Udang</p>
-					<span class="label label-primary">TAMBAH HARGA BARU</span>
-					<hr />
-				</div>				
-			</div>
-			<div class="row content">
-				<div class="container col-lg-6">
-					<div class="panel panel-default">
-						<h2>fill with map</h2>
-					</div>
-				</div>
-				<div class="container col-lg-6">
-					<div class="panel panel-default div_card">
-						<h2>fill with function</h2>
-						<div class="container col-lg-6">
-							
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		
-	<script>
-
-	</script>
-
+		<div ng-view></div>
 	</body>
+	
+	<script>
+		var app = angular.module('myApp', ['ngRoute']);
+		app.config(function($routeProvider) {
+			$routeProvider
+			.when("/", {
+				templateUrl : "shrimpmain.php",
+				controller	: "shrimpmainCtrl"
+			})
+			.when("/detail/:id/:reg_id", {
+				templateUrl : "shrimpdetail.php",
+				controller	: "shrimpdetailCtrl"
+			})
+		});
+		
+		app.controller("shrimpmainCtrl", function($scope, $http) {
+			$http({
+				method 	: "GET",
+				url 	: "https://app.jala.tech/api/shrimp_prices?search&with=creator,species,region"
+			}).then(function mySuccess(response) {
+				$scope.shrimpPrices = response.data.data;
+				console.log(response.data.data);
+			}, function myError(response) {
+				$scope.resError = response.statusText;
+			});
+			
+			$http({
+				method 	: "GET",
+				url 	: "https://app.jala.tech/api/regions/"
+			}).then(function mySuccess(response) {
+				$scope.regions = response.data.data;
+				//console.log(response.data.data);
+			}, function myError(response) {
+				$scope.resError = response.statusText;
+			});
+			
+			$http({
+				method 	: "GET",
+				url 	: "https://app.jala.tech/api/species/"
+			}).then(function mySuccess(response) {
+				$scope.species = response.data.data;
+				//console.log(response.data.data);
+			}, function myError(response) {
+				$scope.resError = response.statusText;
+			});
+		});
+		
+		app.controller("shrimpdetailCtrl", function($scope, $http, $routeParams) {
+			$scope.id = $routeParams.id;
+			$scope.reg_id = $routeParams.reg_id;
+			$http({
+				method 	: "GET",
+				url 	: "https://app.jala.tech/api/shrimp_prices?search&with=creator,species,region&region_id=" + $routeParams.reg_id
+			}).then(function mySuccess(response) {
+				for(let i = 0; i <= response.data.data.length - 1; i++) {
+					if(response.data.data[i].id == $routeParams.id) {
+						console.log(response.data.data[i]);
+						$scope.data1 = response.data.data[i];						
+					}
+				}
+				console.log(response.data.data);
+				$scope.data2 = response.data.data;
+			}, function myError(response) {
+				$scope.resError = response.statusText;
+			});
+			console.log($routeParams.id);
+			console.log($routeParams.reg_id);
+		});		
+	</script>
+	
 </html>
