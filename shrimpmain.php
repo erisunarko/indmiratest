@@ -1,5 +1,6 @@
 <div class="container">
 	<div class="row">
+		<center>
 		<div>
 			Filter Lokasi : 
 			<select>
@@ -30,6 +31,7 @@
 				<option>Termahal</option>
 			</select>
 		</div>
+		</center>
 	</div>
 </div>
 
@@ -42,7 +44,7 @@
 		<hr />
 			<div class="panel panel-default" id="map">
 				<div class="panel-body">
-					
+					<div my-map></div>
 				</div>
 			</div>
 		</div>

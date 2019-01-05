@@ -7,10 +7,15 @@
 				<div class="panel-heading"><p>Detail Harga Udang</p></div>
 				<div class="panel-body">
 					<p><b>Jenis Udang : <span id="bigfont">{{ data1.species.name }}</b></span></p>					
-					<p>Lokasi      : {{ data1.region.regency_name }} {{ data1.region.province_name }}</p>
-					<p>Harga udang ukuran 50 : <span id="price"><b>Rp. {{ data1.size_50 }}</b></span></p>
-					<p>Hubungi Penjual : 081345432123</p>					
+					<p><b>Lokasi      : {{ data1.region.regency_name }} {{ data1.region.province_name }}</b></p>
+					<p><b>Harga udang ukuran 50 : <span id="price"><b>Rp. {{ data1.size_50 }}</b></span></p>
+					<p><b>Hubungi Penjual : 081345432123</b></p>					
 				</div>
+				<hr />
+				<div class="panel-body" ng-repeat="(key, value) in listPrice">
+				<p>Harga udang dengan <b>{{ key }}</b> : <b>Rp. {{ value }}</b></p>
+				</div>
+				<div class="panel-footer">Catatan : {{ data1.remark }}</div>
 				<div class="panel-footer"><span class="label label-primary">UBAH</span></div>
 			</div>
 		</div>

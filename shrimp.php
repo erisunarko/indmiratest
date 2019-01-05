@@ -9,34 +9,47 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-		<!-- Google map API 
-		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA38N74y_xGwSV0bI_36OIXDdH-corZO5A&callback=myMap"></script>
-		-->
+		<!-- Google map API -->
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA38N74y_xGwSV0bI_36OIXDdH-corZO5A" ></script>
 		<style>
 			a:hover {
-				text-decoration 	: none;
+				text-decoration : none;
 			}
 			.label:empty {
-				display 	: none;
+				display : none;
 			}
 			.textblue {
-				color 	: blue;
+				color : blue;
 			}
 			.textblack {
-				color 	: black;
-			}
-			#map {
-				background-color : lightgrey;
+				color : black;
 			}
 			#price {
-				font-size 		: 20px;
+				font-size : 20px;
 			}
 			#bigfont {
-				font-size 		: 20px;
+				font-size : 20px;
+			}
+			#gmaps {
+				width : 100%;
+				height: 80%;
+			}
+			#floating-panel {
+				position: absolute;
+				top: 10px;
+				left: 25%;
+				z-index: 5;
+				background-color: #fff;
+				padding: 5px;
+				border: 1px solid #999;
+				text-align: center;
+				font-family: 'Roboto','sans-serif';
+				line-height: 30px;
+				padding-left: 10px;
 			}
 		</style>
 	</head>
-
+	
 	<body ng-app="myApp">
 		<div id="header">
 			<div>
@@ -77,7 +90,7 @@
 				url 	: "https://app.jala.tech/api/regions/"
 			}).then(function mySuccess(response) {
 				$scope.regions = response.data.data;
-				//console.log(response.data.data);
+				console.log(response.data.data);
 			}, function myError(response) {
 				$scope.resError = response.statusText;
 			});
@@ -91,6 +104,7 @@
 			}, function myError(response) {
 				$scope.resError = response.statusText;
 			});
+						
 		});
 		
 		app.controller("shrimpdetailCtrl", function($scope, $http, $routeParams) {
@@ -103,7 +117,17 @@
 				for(let i = 0; i <= response.data.data.length - 1; i++) {
 					if(response.data.data[i].id == $routeParams.id) {
 						console.log(response.data.data[i]);
-						$scope.data1 = response.data.data[i];						
+						$scope.data1 	= response.data.data[i];
+						var listPrice 	= {};
+						for(let k = 20; k <= 200; k = k + 10) {
+							let iteration = "size_" + k;
+							if(response.data.data[i][iteration] != null) {								
+								listPrice[iteration] = response.data.data[i][iteration];
+								//console.log(response.data.data[i][iteration]);
+							}
+						}
+						console.log(listPrice);
+						$scope.listPrice = listPrice;
 					}
 				}
 				console.log(response.data.data);
@@ -113,7 +137,59 @@
 			});
 			console.log($routeParams.id);
 			console.log($routeParams.reg_id);
+		});
+		
+		app.directive('myMap', function() {
+			// directive link function
+			var link = function(scope, element, attrs) {
+				var map, infoWindow;
+				var markers = [];
+				
+				// map config
+				var mapOptions = {
+					center: new google.maps.LatLng(2.5489, 118.0149),
+					zoom: 5,
+					mapTypeId: google.maps.MapTypeId.ROADMAP,
+					scrollwheel: false
+				};
+				
+				// init the map
+				function initMap() {
+					map = new google.maps.Map(element[0], mapOptions);
+					var geocoder = new google.maps.Geocoder();
+					var address = 'semarang';
+					geocoder.geocode({'address': address}, function(results, status) {
+					  if (status === 'OK') {
+						map.setCenter(results[0].geometry.location);
+						var marker = new google.maps.Marker({
+						  map 		: map,
+						  position 	: results[0].geometry.location,
+						  title 	: 'Harga :'
+						});
+					  } else {
+						alert('Geocode was not successful for the following reason: ' + status);
+					  }
+					});
+				}
+				
+				// show the map
+				initMap();
+				
+			};
+			
+			return {
+				template 	: '<div id="gmaps"><h1 id="floating-panel">judul</h1></div>',
+				replace 	: true,
+				link 		: link
+			};
 		});		
+		
+		$(document).ready(function() {
+			setTimeout(function() {
+				//initMap();
+			}, 2000);
+		});
+		
 	</script>
 	
 </html>
